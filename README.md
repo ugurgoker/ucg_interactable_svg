@@ -36,10 +36,8 @@ import 'package:ucg_interactable_svg/ucg_interactable_svg/ucg_interactable_svg.d
         )
 ```
 
-Also your SVG must follow the following pattern.For better understanding see the example SVG.
 ```
-'.* id="(.*)" name="(.*)" .* d="(.*)"'
-for example:
+for svg path example:
   <path id="118" title="room 9" class="st0" d="M55 508h101.26v330H55Z" fill="#000000" style="fill:rgb(0, 0, 0)" />;
 
 ```
@@ -51,6 +49,8 @@ To select a region without clicking on the SVG see the below code.For better und
 | svgAddress       |          `String`          |    Address of an SVG like  svg tags    |
 | width           |         `double?`          |     SVG width. Default value is double.infinity      |
 | onChanged       | `Function(Region? region)` |       Returns new region value when it changed       |
+| selectedColor       | `Color` |       Selected svg path color       |
+
 
 Author
 ------

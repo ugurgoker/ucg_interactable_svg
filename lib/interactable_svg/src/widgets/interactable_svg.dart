@@ -10,7 +10,6 @@ class UcgInteractableSvg extends StatefulWidget {
   final String svgAddress;
   final Function(Region region) onChanged;
   final Color? selectedColor;
-  final bool? toggleEnable;
   final bool? isMultiSelectable;
 
   const UcgInteractableSvg({
@@ -20,7 +19,6 @@ class UcgInteractableSvg extends StatefulWidget {
     this.width,
     this.height,
     this.selectedColor,
-    this.toggleEnable,
     this.isMultiSelectable,
   }) : super(key: key);
 
