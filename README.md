@@ -16,7 +16,7 @@ dependencies:
 In your library file add the following import:
 
 ```dart
-import 'package:ucg_interactable_svg/ucg_interactable_svg/ucg_interactable_svg.dart';
+import 'package:ucg_interactable_svg/interactable_svg/src/widgets/interactable_svg.dart';
 ```
 
 ## Usage
