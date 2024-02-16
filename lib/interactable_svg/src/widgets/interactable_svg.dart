@@ -11,16 +11,22 @@ class UcgInteractableSvg extends StatefulWidget {
   final Function(Region region) onChanged;
   final Color? selectedColor;
   final bool? isMultiSelectable;
+  final List<int> unSelectableIds;
+  final Color? unSelectableColor;
+  final String? unSelectableText;
 
-  const UcgInteractableSvg({
-    Key? key,
-    required this.svgAddress,
-    required this.onChanged,
-    this.width,
-    this.height,
-    this.selectedColor,
-    this.isMultiSelectable,
-  }) : super(key: key);
+  const UcgInteractableSvg(
+      {Key? key,
+      required this.svgAddress,
+      required this.onChanged,
+      this.width,
+      this.height,
+      this.selectedColor,
+      this.isMultiSelectable,
+      this.unSelectableIds = const [],
+      this.unSelectableColor,
+      this.unSelectableText})
+      : super(key: key);
 
   @override
   UcgInteractableSvgState createState() => UcgInteractableSvgState();
@@ -30,23 +36,26 @@ class UcgInteractableSvgState extends State<UcgInteractableSvg> {
   final List<Region> _regionList = [];
 
   List<Region> selectedRegion = [];
-  final _sizeController = SizeController.instance;
+  SizeController? _sizeController;
   Size? mapSize;
 
   @override
   void initState() {
     super.initState();
+    Parser.refreshClass();
+    SizeController.refreshClass();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadRegionList();
     });
   }
 
   _loadRegionList() async {
-    final list = await Parser.instance.svgToRegionList(widget.svgAddress);
+    final list = await Parser.instance.svgToRegionList(widget.svgAddress, widget.unSelectableIds, widget.unSelectableText, widget.unSelectableColor);
+    _sizeController = SizeController.instance;
     _regionList.clear();
     setState(() {
       _regionList.addAll(list);
-      mapSize = _sizeController.mapSize;
+      mapSize = _sizeController?.mapSize;
     });
   }
 
@@ -58,9 +67,20 @@ class UcgInteractableSvgState extends State<UcgInteractableSvg> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    final size = MediaQuery.of(context).size;
+    final mapSize = _sizeController?.mapSize;
+    return Row(
       children: [
-        for (var region in _regionList) _buildStackItem(region),
+        Container(width: mapSize == null ? 0 : mapSize.width >= size.width ? 20 : (size.width - mapSize.width) / 2.5),
+        Expanded(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              for (var region in _regionList) _buildStackItem(region),
+            ],
+          ),
+        ),
+        Container(width: mapSize == null ? 0 : mapSize.width >= size.width ? 20 : (size.width - mapSize.width) / 2.5),
       ],
     );
   }

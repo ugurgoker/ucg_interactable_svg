@@ -13,11 +13,13 @@ class Parser {
     return _instance!;
   }
 
+  static void refreshClass() => _instance = null;
+
   final sizeController = SizeController.instance;
 
   Parser._init();
 
-  Future<List<Region>> svgToRegionList(String svg) async {
+  Future<List<Region>> svgToRegionList(String svg, List<int> notSelectableIds, String? notSelectableText, Color? notSelectableColor) async {
     List<Region> regionList = [];
 
     XmlDocument document = XmlDocument.parse(svg);
@@ -25,12 +27,14 @@ class Parser {
 
     double width = 0;
     double height = 0;
-   
+    String viewBox = '';
+
     if (width == 0 || height == 0) {
       var svgs = document.findAllElements('svg');
       for (var element in svgs) {
         width = double.tryParse(element.getAttribute('width').toString()) ?? 0;
         height = double.tryParse(element.getAttribute('height').toString()) ?? 0;
+        viewBox = element.getAttribute('viewBox').toString();
       }
     }
 
@@ -38,39 +42,58 @@ class Parser {
       String? partId = element.getAttribute('id')?.toString();
       String partPath = element.getAttribute('d').toString();
       String? title = element.getAttribute('title')?.toString();
-      String? color = element.getAttribute('fill')?.toString();
       String? style = element.getAttribute('style')?.toString();
+      var color = element.getAttribute('fill')?.toString().toColor(style);
 
-      Color c = Colors.black;
-      if (color != null) {
-        var colorCode = color;
-        switch (colorCode) {
-          case 'black':
-            c = Colors.black;
-            break;
-          case 'white':
-            c = Colors.white;
-            break;
-          default:
-            c = Color(int.parse('0xFF${color.replaceAll('#', '')}'));
-            break;
-        }
-      }
-      if (style != null) {
-        var rgbList = style.split('fill: rgb').last.replaceAll('(', '').replaceAll(';', '').replaceAll(')', '').replaceAll(' ', '').split(',');
-        if (rgbList.length == 3) {
-          c = Color.fromRGBO(int.tryParse(rgbList.first) ?? 0, int.tryParse(rgbList[1]) ?? 0, int.tryParse(rgbList.last) ?? 0, 1);
-        }
+      final integerPartId = int.tryParse(partId ?? '') ?? -1;
+      if (integerPartId != -1 && notSelectableIds.contains(integerPartId)) {
+        title = notSelectableText;
+        color = notSelectableColor ?? color;
       }
 
-      var region = Region(id: partId ?? 'nullId', path: parseSvgPath(partPath), color: c, pathString: partPath, title: title);
+      var region = Region(
+        id: partId ?? 'nullId',
+        path: parseSvgPath(partPath),
+        color: color ?? Colors.black,
+        pathString: partPath,
+        title: title,
+      );
       sizeController.addBounds(region.path.getBounds());
       regionList.add(region);
     }
 
-    if (width > 0 && height > 0) {
-      sizeController.mapSize = Size(width, height);
+    if (viewBox.isNotEmpty && viewBox.split(' ').isNotEmpty) {
+      height = double.tryParse(viewBox.split(' ')[3]) ?? 0;
+      width = double.tryParse(viewBox.split(' ')[2]) ?? 0;
     }
+    sizeController.mapSize = Size(width, height);
     return regionList;
+  }
+}
+
+extension StringExtension on String? {
+  Color toColor(String? style) {
+    Color c = Colors.black;
+    if (style != null) {
+      var rgbList = style.split('fill: rgb').last.replaceAll('(', '').replaceAll(';', '').replaceAll(')', '').replaceAll(' ', '').split(',');
+      if (rgbList.length == 3) {
+        c = Color.fromRGBO(int.tryParse(rgbList.first) ?? 0, int.tryParse(rgbList[1]) ?? 0, int.tryParse(rgbList.last) ?? 0, 1);
+      }
+    }
+    if (this != null) {
+      var colorCode = this;
+      switch (colorCode) {
+        case 'black':
+          c = Colors.black;
+          break;
+        case 'white':
+          c = Colors.white;
+          break;
+        default:
+          c = Color(int.parse('0xFF${this!.replaceAll('#', '')}'));
+          break;
+      }
+    }
+    return c;
   }
 }

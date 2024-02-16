@@ -9,6 +9,8 @@ class SizeController {
     return _instance!;
   }
 
+  static void refreshClass() => _instance = null;
+
   SizeController._init();
 
   final RefionArea _regionArea = RefionArea();
@@ -44,22 +46,29 @@ class SizeController {
       return 1.0;
     }
 
-    if (containerSize.width > mapSize.width) {
-      return mapSize.width * (containerSize.width / mapSize.width);
+    Size? newContainerSize;
+
+    double newWidth = 0, newHeight = 0;
+
+    if (containerSize.aspectRatio < 1 && mapSize.aspectRatio > 1) {
+      newWidth = containerSize.width;
+      newHeight = newWidth * containerSize.width / containerSize.height;
+      newContainerSize = Size(newWidth, newHeight);
+      return newContainerSize.width / mapSize.width;
     }
 
-    // Aspect Ratio
-    double newWidth = containerSize.width, newHeight = containerSize.height;
-    if (containerSize.width > containerSize.height) {
-      newHeight = 1 / (mapSize.aspectRatio / containerSize.width);
-    } else {
-      newHeight = containerSize.width / mapSize.aspectRatio;
+    if (containerSize.aspectRatio < 1 && mapSize.aspectRatio < 1) {
+      newHeight = containerSize.height;
+      newWidth = newHeight * (mapSize.aspectRatio);
+      newContainerSize = Size(newWidth, newHeight);
+      return newContainerSize.height / mapSize.height;
     }
-    containerSize = Size(newWidth, newHeight);
+
+    newContainerSize = Size(newWidth, newHeight);
 
     // Scale for Responsive UI
-    double scale1 = containerSize.width / mapSize.width;
-    double scale2 = containerSize.height / mapSize.height;
+    double scale1 = newContainerSize.width / mapSize.width;
+    double scale2 = newContainerSize.height / mapSize.height;
     double mapScale = scale1 > scale2 ? scale1 : scale2;
 
     return mapScale;

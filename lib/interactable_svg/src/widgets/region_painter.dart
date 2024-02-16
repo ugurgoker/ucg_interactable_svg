@@ -28,7 +28,8 @@ class RegionPainter extends CustomPainter {
       ..color = selectedColor ?? Colors.blue
       ..style = PaintingStyle.fill;
 
-    _scale = sizeController.calculateScale(size);
+      _scale = sizeController.calculateScale(size);
+    
     canvas.scale(_scale);
 
     if (selectedRegion.contains(region) && (int.tryParse(region.id) ?? 0) != 0) {
