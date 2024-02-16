@@ -22,15 +22,10 @@ class Parser {
 
     XmlDocument document = XmlDocument.parse(svg);
     var paths = document.findAllElements('path');
-    var rects = document.findAllElements('rect');
 
     double width = 0;
     double height = 0;
-    for (var element in rects) {
-      width = double.tryParse(element.getAttribute('width').toString()) ?? 0;
-      height = double.tryParse(element.getAttribute('height').toString()) ?? 0;
-    }
-
+   
     if (width == 0 || height == 0) {
       var svgs = document.findAllElements('svg');
       for (var element in svgs) {
