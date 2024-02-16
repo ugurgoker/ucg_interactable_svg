@@ -10,7 +10,7 @@ class UcgInteractableSvg extends StatefulWidget {
   final String svgAddress;
   final Function(Region region) onChanged;
   final Color? selectedColor;
-  final bool? isMultiSelectable;
+  final bool isMultiSelectable;
   final List<int> unSelectableIds;
   final Color? unSelectableColor;
   final String? unSelectableText;
@@ -22,7 +22,7 @@ class UcgInteractableSvg extends StatefulWidget {
       this.width,
       this.height,
       this.selectedColor,
-      this.isMultiSelectable,
+      this.isMultiSelectable = false,
       this.unSelectableIds = const [],
       this.unSelectableColor,
       this.unSelectableText})
@@ -105,12 +105,15 @@ class UcgInteractableSvgState extends State<UcgInteractableSvg> {
     setState(() {
       if (selectedRegion.contains(region)) {
         selectedRegion.remove(region);
+        setState(() {});
       } else {
-        if (widget.isMultiSelectable ?? false) {
+        if (widget.isMultiSelectable) {
           selectedRegion.add(region);
+          setState(() {});
         } else {
           selectedRegion.clear();
           selectedRegion.add(region);
+          setState(() {});
         }
       }
       widget.onChanged.call(region);
