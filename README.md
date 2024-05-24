@@ -29,9 +29,18 @@ import 'package:ucg_interactable_svg/interactable_svg/src/widgets/interactable_s
             svgAddress: '<svg> </svg>',
             width: double.infinity,
             height: double.infinity,
-            unSelectableColor: Colors.red,
-            unSelectableText: 'this region is unselectable',
-            unSelectableIds: const [118],
+            unSelectableColor: (int partId, Color? defaultColor) {
+              if (partId == yourUnSelectableId) {
+                return Colors.red;
+              }
+              return null;
+            },
+            unSelectableText: (int partId, String? defaultTitle) {
+              if (partId == yourUnSelectableId) {
+                return 'this region is unselectable';
+              }
+              return null;
+            },
             selectedColor: Colors.black,
             isMultiSelectable: false,
             onChanged: (region) {

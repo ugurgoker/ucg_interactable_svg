@@ -19,7 +19,11 @@ class Parser {
 
   Parser._init();
 
-  Future<List<Region>> svgToRegionList(String svg, List<int> notSelectableIds, String? notSelectableText, Color? notSelectableColor) async {
+  Future<List<Region>> svgToRegionList(
+    String svg,
+    String? Function(int partId, String? defaultTitle)? pathTitle,
+    Color? Function(int partId, Color? defaultColor)? pathColor,
+  ) async {
     List<Region> regionList = [];
 
     XmlDocument document = XmlDocument.parse(svg);
@@ -44,19 +48,25 @@ class Parser {
       String? title = element.getAttribute('title')?.toString();
       String? style = element.getAttribute('style')?.toString();
       var color = element.getAttribute('fill')?.toString().toColor(style);
+      var strokeColor = element.getAttribute('stroke').toColor(null);
+      var strokeWidth = int.tryParse(element.getAttribute('stroke-width') ?? '');
 
       final integerPartId = int.tryParse(partId ?? '') ?? -1;
-      if (integerPartId != -1 && notSelectableIds.contains(integerPartId)) {
-        title = notSelectableText;
-        color = notSelectableColor ?? color;
+      if (integerPartId != -1 && pathColor != null) {
+        color = pathColor(integerPartId, color) ?? color;
+      }
+      if (integerPartId != -1 && pathTitle != null) {
+        title = pathTitle(integerPartId, title) ?? title;
       }
 
       var region = Region(
         id: partId ?? 'nullId',
         path: parseSvgPath(partPath),
-        color: color ?? Colors.black,
+        color: color ?? Colors.transparent,
         pathString: partPath,
         title: title,
+        strokeColor: strokeColor,
+        strokeWidth: strokeWidth,
       );
       sizeController.addBounds(region.path.getBounds());
       regionList.add(region);
@@ -73,7 +83,7 @@ class Parser {
 
 extension StringExtension on String? {
   Color toColor(String? style) {
-    Color c = Colors.black;
+    Color c = Colors.transparent;
     if (style != null) {
       var rgbList = style.split('fill: rgb').last.replaceAll('(', '').replaceAll(';', '').replaceAll(')', '').replaceAll(' ', '').split(',');
       if (rgbList.length == 3) {

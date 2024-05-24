@@ -11,9 +11,8 @@ class UcgInteractableSvg extends StatefulWidget {
   final Function(Region region) onChanged;
   final Color? selectedColor;
   final bool isMultiSelectable;
-  final List<int> unSelectableIds;
-  final Color? unSelectableColor;
-  final String? unSelectableText;
+  final Color? Function(int partId, Color? defaultColor)? unSelectableColor;
+  final String? Function(int partId, String? title)? unSelectableText;
 
   const UcgInteractableSvg(
       {Key? key,
@@ -23,7 +22,6 @@ class UcgInteractableSvg extends StatefulWidget {
       this.height,
       this.selectedColor,
       this.isMultiSelectable = false,
-      this.unSelectableIds = const [],
       this.unSelectableColor,
       this.unSelectableText})
       : super(key: key);
@@ -50,7 +48,7 @@ class UcgInteractableSvgState extends State<UcgInteractableSvg> {
   }
 
   _loadRegionList() async {
-    final list = await Parser.instance.svgToRegionList(widget.svgAddress, widget.unSelectableIds, widget.unSelectableText, widget.unSelectableColor);
+    final list = await Parser.instance.svgToRegionList(widget.svgAddress, widget.unSelectableText, widget.unSelectableColor);
     _sizeController = SizeController.instance;
     _regionList.clear();
     setState(() {

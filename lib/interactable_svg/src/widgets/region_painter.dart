@@ -28,8 +28,16 @@ class RegionPainter extends CustomPainter {
       ..color = selectedColor ?? Colors.blue
       ..style = PaintingStyle.fill;
 
-      _scale = sizeController.calculateScale(size);
-    
+    Paint? strokePen;
+    if (region.strokeColor != null && region.strokeWidth != null) {
+      strokePen = Paint()
+        ..style = PaintingStyle.stroke
+        ..color = region.strokeColor!
+        ..strokeWidth = region.strokeWidth!.toDouble();
+    }
+
+    _scale = sizeController.calculateScale(size);
+
     canvas.scale(_scale);
 
     if (selectedRegion.contains(region) && (int.tryParse(region.id) ?? 0) != 0) {
@@ -37,6 +45,9 @@ class RegionPainter extends CustomPainter {
     }
 
     canvas.drawPath(region.path, pen);
+    if (strokePen != null) {
+      canvas.drawPath(region.path, strokePen);
+    }
   }
 
   @override
