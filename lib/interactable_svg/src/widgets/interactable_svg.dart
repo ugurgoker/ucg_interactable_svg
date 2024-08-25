@@ -13,18 +13,20 @@ class UcgInteractableSvg extends StatefulWidget {
   final bool isMultiSelectable;
   final Color? Function(int partId, Color? defaultColor)? unSelectableColor;
   final String? Function(int partId, String? title)? unSelectableText;
+  final bool isActivePadding;
 
-  const UcgInteractableSvg(
-      {Key? key,
-      required this.svgAddress,
-      required this.onChanged,
-      this.width,
-      this.height,
-      this.selectedColor,
-      this.isMultiSelectable = false,
-      this.unSelectableColor,
-      this.unSelectableText})
-      : super(key: key);
+  const UcgInteractableSvg({
+    Key? key,
+    required this.svgAddress,
+    required this.onChanged,
+    this.width,
+    this.height,
+    this.selectedColor,
+    this.isMultiSelectable = false,
+    this.unSelectableColor,
+    this.unSelectableText,
+    this.isActivePadding = true,
+  }) : super(key: key);
 
   @override
   UcgInteractableSvgState createState() => UcgInteractableSvgState();
@@ -68,18 +70,37 @@ class UcgInteractableSvgState extends State<UcgInteractableSvg> {
     final size = MediaQuery.of(context).size;
     final mapSize = _sizeController?.mapSize;
     return Row(
-      children: [
-        Container(width: mapSize == null ? 0 : mapSize.width >= size.width ? 20 : (size.width - mapSize.width) / 2.5),
-        Expanded(
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              for (var region in _regionList) _buildStackItem(region),
+      children: widget.isActivePadding
+          ? [
+              Container(
+                  width: mapSize == null
+                      ? 0
+                      : mapSize.width >= size.width
+                          ? 20
+                          : (size.width - mapSize.width) / 2.5),
+              Expanded(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    for (var region in _regionList) _buildStackItem(region),
+                  ],
+                ),
+              ),
+              Container(
+                  width: mapSize == null
+                      ? 0
+                      : mapSize.width >= size.width
+                          ? 20
+                          : (size.width - mapSize.width) / 2.5),
+            ]
+          : [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  for (var region in _regionList) _buildStackItem(region),
+                ],
+              ),
             ],
-          ),
-        ),
-        Container(width: mapSize == null ? 0 : mapSize.width >= size.width ? 20 : (size.width - mapSize.width) / 2.5),
-      ],
     );
   }
 

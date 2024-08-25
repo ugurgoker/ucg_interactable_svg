@@ -1,11 +1,10 @@
 name: ucg_interactable_svg
 description: Flutter package to interact with different regions of an SVG.
-version: 1.0.24
+version: 1.0.25
 homepage: https://github.com/ugurgoker/ucg_interactable_svg
 
 environment:
-  sdk: '>=2.18.2 <4.0.0'
-  flutter: ">=1.17.0"
+  sdk: ^3.5.1
 
 dependencies:
   flutter:
@@ -13,9 +12,3 @@ dependencies:
 
   svg_path_parser: ^1.1.2
   xml: ^6.5.0
-
-dev_dependencies:
-
-
-
-
